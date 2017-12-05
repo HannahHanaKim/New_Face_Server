@@ -57,7 +57,7 @@ public class login extends Thread {
        *  input: id and password of the user
        *  output: the user's basic information and the matched probability
        *  In this method, we have to calculate the probability based on the matched elements.
-       *  
+       *  After calculating probability, send the informations to the client
        */
       public void login(){
          try {
@@ -202,7 +202,6 @@ public class login extends Thread {
       }
       public void run() {
          try {
-
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8")); //read from the client
             //UTF-8 is for Korean translation
             out = new PrintWriter(socket.getOutputStream(), true);  //print what the client wrote
