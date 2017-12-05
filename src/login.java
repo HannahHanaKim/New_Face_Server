@@ -57,7 +57,7 @@ public class login extends Thread {
        *  input: id and password of the user
        *  output: the user's basic information and the matched probability
        *  In this method, we have to calculate the probability based on the matched elements.
-       *  After calculating probability, send the informations to the client.nuhnhunh
+       *  After calculating probability, send the informations to the client.
        */
       public void login(){
          try {
