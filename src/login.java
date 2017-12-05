@@ -41,23 +41,29 @@ public class login extends Thread {
       private String password;
       private String standard ="";
       private String matching_cmp = "";
-      private String[] login = new String[2];
-      private String[] signup = new String[6];
+      private String[] login = new String[2]; //getting values from the client
+      private String[] signup = new String[6]; //for getting values to input in the file
       private String login_id;
       private String login_pw;
       private Socket socket;
       private BufferedReader in;
       private PrintWriter out;
-
+      private double probability;
+      
       public Handler(Socket socket) {
          this.socket = socket;
       }
-
+      /** Login method
+       *  input: id and password of the user
+       *  output: the user's basic information and the matched probability
+       *  In this method, we have to calculate the probability based on the matched elements.
+       *  
+       */
       public void login(){
-         try{
-
-            String all_friend = "";
-            try {  //open file
+         try {
+            String all_friend = ""; //initialize
+            /* reading file for the first time: USER IDENTIFICATION */
+            try {  //open file 
                inputStream = new Scanner(new File(fileName));
             } catch (FileNotFoundException e) {
                System.out.println("Error opening the file " + fileName);
@@ -74,66 +80,67 @@ public class login extends Thread {
             String[] fileValue = new String[5]; //each value will go into a fileValue array
             
             String[] my_friend = new String[100];
-            int myf_cnt = 0;
-            int flg = 0;
+            int myf_cnt = 0; //친구들 개수
+            int flg = 0; //number of times of reading file
             
             while (true) {
-               try{
+            	/* reading file for the second time: for MATCHING */
+               try { 
                   fileLine = inputStream.nextLine();
-               } catch (Exception e){
-                  if (flg == 1){
-                     inputStream.close();
-                     try {
-                        inputStream = new Scanner(new File(fileName));
+               } catch (Exception e) {
+                  if (flg == 1) { //already read once
+                     /* need to read the file again */
+                     try { //we have to open the file again for the login
+                        inputStream = new Scanner(new File(fileName)); //read again
                      } catch (FileNotFoundException e1) {
                         System.out.println("Error opening the file " + fileName);
                         System.exit(0);
                      }
                      my_friend = new String[100];
-                     System.out.println("두번돔ㅎㅎㅎ");
                      myf_cnt = 0;
                      flg = 2;
                      fileLine = inputStream.nextLine();
                   }
-                  else{
+                  else {
                      break;
                   }   
                }
-               System.out.println(fileLine + "-");
-               if (fileLine == null)
+              
+               if (fileLine == null) //just in case
                   break;
    
                fileValue = fileLine.split(" ");
                id = fileValue[1];
                password = fileValue[2];
    
-               if (id.equals(login_id) && password.equals(login_pw)) { //if it is the logined person,
-                  if (flg == 2){
+               if (id.equals(login_id) && password.equals(login_pw)) { //if login success,
+                  if (flg == 2) {
                      flg = 2;
-                  }else{
-                     flg = 1;
+                  } else { 
+                     flg = 1; //처음 돈 거
                   }
-                  
-                  standard = fileValue[5];
+                  standard = fileValue[5]; //input the user's matching value into another variable.
                }
                else { //for comparing with other people that are stored in the file
-                  matching_cmp = fileValue[5];
+                  matching_cmp = fileValue[5]; //comparing variable
                   int count = 0;
                   for (int i = 0; i < standard.length(); i++) { //compare
                      if (standard.charAt(i) == matching_cmp.charAt(i)) //if the bit is the same,
                         count++; //increase the count value
                   }
-                  
-                  double probability = (double)((double)count / 43.0) * (double)100;
+                  //calculate the probability
+                  probability = (double)((double)count / 43.0) * (double)100;
+                  //store information in array to send it to the client
                   my_friend[myf_cnt] = "/ " + fileValue[0] + " " + fileValue[1] + " " + fileValue[3] + " " + fileValue[4] + " " + Double.toString(probability);
                   myf_cnt++;
                }
       
-               for (int ii = 0; ii < myf_cnt - 1; ii++){
-                  for (int i = 0; i < myf_cnt - 1; i++){
-                     if (my_friend[i + 1] != null){
-                        if (Double.parseDouble((my_friend[i].split(" ")[5])) < Double.parseDouble((my_friend[i+1].split(" ")[5]))){
-                           String tmp = my_friend[i + 1];
+               for (int ii = 0; ii < myf_cnt - 1; ii++) {
+                  for (int i = 0; i < myf_cnt - 1; i++) {
+                     if (my_friend[i + 1] != null) { //until the file end
+                        if (Double.parseDouble((my_friend[i].split(" ")[5])) < Double.parseDouble((my_friend[i+1].split(" ")[5]))) { // compare
+                        	/* change */
+                           String tmp = my_friend[i + 1]; 
                            my_friend[i + 1] = my_friend[i];
                            my_friend[i] = tmp;
                         }
@@ -142,20 +149,26 @@ public class login extends Thread {
                      }
                   }
                }
-            }
+            } //end while
                
-            for (int i = 0;i<myf_cnt;i++){
+            for (int i = 0;i<myf_cnt;i++) {
                all_friend = all_friend + my_friend[i];
             }
             if (flg == 1 || flg == 2)
                out.println(all_friend);
             else
                out.println("Error");
-         } catch (Exception e){
+            inputStream.close();
+         } catch (Exception e) {
             
          }
       }
       
+      /** Sign up method
+       *  for the new clients
+       *  input: get information from the new user
+       *  output: none_just store it into the file
+       */
       public void signUp() {
          try {
             from_client = in.readLine(); //receive the name from the client
@@ -169,7 +182,7 @@ public class login extends Thread {
             characters.add(signup[3]); // character picture
             intro.add(signup[4]); //introduction
             mapping.add(signup[5]); //mapping
-            out.println("회원가입 성공!");
+            out.println("회원가입 성공");
             
             //storing information into the file
             try {
@@ -180,14 +193,12 @@ public class login extends Thread {
             }
 
             outputStream.print(signup[0] + " " + signup[1] + " " + signup[2] + " " + signup[3] + " " + signup[4] + " " + signup[5]);  //stored!
-            System.out.println(signup[0] + " " + signup[1] + " " + signup[2] + " " + signup[3] + " " + signup[4] + " " + signup[5]); /** erase **/
             outputStream.print("\n");
-            System.out.print("\n");
             outputStream.close();
    
          } catch (Exception e) {
             
-      }
+         }
       }
       public void run() {
          try {
