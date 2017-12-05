@@ -145,8 +145,6 @@ public class login extends Thread {
             }
                
             for (int i = 0;i<myf_cnt;i++){
-               if (i == 20)
-                  break;
                all_friend = all_friend + my_friend[i];
             }
             if (flg == 1 || flg == 2)
