@@ -80,7 +80,7 @@ public class login extends Thread {
             String[] fileValue = new String[5]; //each value will go into a fileValue array
             
             String[] my_friend = new String[100];
-            int myf_cnt = 0; //친구들 개수
+            int myf_cnt = 0; //number of friends
             int flg = 0; //number of times of reading file
             
             while (true) {
@@ -117,7 +117,7 @@ public class login extends Thread {
                   if (flg == 2) {
                      flg = 2;
                   } else { 
-                     flg = 1; //처음 돈 거
+                     flg = 1; //first rotation
                   }
                   standard = fileValue[5]; //input the user's matching value into another variable.
                }
@@ -134,12 +134,12 @@ public class login extends Thread {
                   my_friend[myf_cnt] = "/ " + fileValue[0] + " " + fileValue[1] + " " + fileValue[3] + " " + fileValue[4] + " " + Double.toString(probability);
                   myf_cnt++;
                }
-      
+               /* sorting */
                for (int ii = 0; ii < myf_cnt - 1; ii++) {
                   for (int i = 0; i < myf_cnt - 1; i++) {
                      if (my_friend[i + 1] != null) { //until the file end
                         if (Double.parseDouble((my_friend[i].split(" ")[5])) < Double.parseDouble((my_friend[i+1].split(" ")[5]))) { // compare
-                        	/* change */
+                        	/* swap */
                            String tmp = my_friend[i + 1]; 
                            my_friend[i + 1] = my_friend[i];
                            my_friend[i] = tmp;
